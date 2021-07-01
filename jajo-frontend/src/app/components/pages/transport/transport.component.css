@@ -1,0 +1,9 @@
+.deleteCountButton{
+  line-height: 18px;
+  height: auto;
+  width: auto;
+}
+
+.deleteTransportButton {
+  color: red;
+}

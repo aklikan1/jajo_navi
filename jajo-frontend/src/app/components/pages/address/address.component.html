@@ -1,0 +1,83 @@
+<div fxLayout="row">
+  <div fxFlex.gt-sm="70%" >
+    <mat-card>
+      <!-- Information and button: new address -->
+      <mat-card-content>
+        <mat-card-title> All Addresses
+          <button mat-raised-button color="primary" style="margin-left: 10px"
+          (click)="addNewBudget(addressTemplate)">
+            Add new <mat-icon>add</mat-icon></button>
+          <p></p>
+          <mat-card-subtitle>Information about addresses</mat-card-subtitle>
+        </mat-card-title>
+
+        <!-- Addresses list -->
+        <mat-grid-list cols="8" rowHeight="40px" style="font-size: large; font-weight: bold">
+          <mat-grid-tile [colspan]="1">LP</mat-grid-tile>
+          <mat-grid-tile [colspan]="3">Address name</mat-grid-tile>
+          <mat-grid-tile [colspan]="1">Delete</mat-grid-tile>
+          <mat-grid-tile [colspan]="1">Mr/mrs</mat-grid-tile>
+        </mat-grid-list>
+
+        <div cdkDropList (cdkDropListDropped)="drop($event)" class="drag-list">
+          <mat-grid-list cols="8" rowHeight="30px" *ngFor="let address of addresses" cdkDrag>
+            <mat-grid-tile style="font-weight: bold" class="drag-box" [colspan]="1">{{address.hierarchy}}</mat-grid-tile>
+            <mat-grid-tile [colspan]="3">
+              <input class="input-label drag-box" (dblclick)="changeAddressName(address)" (change)="updateAddress(address)"
+                     (blur)="lostFocus(address)" [(ngModel)]="address.name" [readOnly]="address.read_only"
+                     id="{{address.id}}" style="text-align: left;">
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" class="drag-box">
+              <button mat-icon-button style="margin-left: 10px" type="button"
+                      (click)="deleteAddressById(confirmDeleteModal, address)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1">
+              <mat-checkbox [checked]="address.isMrMrs" (change)="changeOfficial($event.checked, address)"></mat-checkbox>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<!-- Template new address -->
+<ng-template #addressTemplate let-modal>
+  <div class="modal-content">
+    <div class="modal-body">
+      <input class="form-control" id="inlineFormInputGroup" placeholder="New address..." type="text"
+             [(ngModel)]="newAddressName" name="budgetName" (keyup.enter)="modal.close();" autocomplete="off"
+      />
+      <div class="modal-footer" >
+        <button mat-raised-button color="primary" type="button" (click)="modal.close();">Add new</button>
+       <button mat-raised-button color="primary" type="button" (click)="modal.dismiss()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template confirm delete address -->
+<ng-template #confirmDeleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Delete Address</h4>
+    <button type="button" mat-icon-button (click)="modal.dismiss('Cross click')">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p><strong>Are you sure you want to delete <span class="text-primary">"{{tempDeleteInformation}}"</span>?</strong></p>
+    <p>All information associated to this address will be permanently deleted. <br>
+      <span class="text-danger">This operation can not be undone.</span>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <button type="button" class="btn btn-danger" (click)="modal.close('Ok click')">Ok</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+    </div>
+
+  </div>
+</ng-template>

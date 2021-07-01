@@ -1,0 +1,103 @@
+<div fxLayout="row">
+  <div fxFlex.gt-sm="70%" >
+    <mat-card>
+      <!-- Information and button: new address -->
+      <mat-card-content>
+        <mat-card-title> All Products
+          <button mat-raised-button color="primary" style="margin-left: 10px"
+                  (click)="addNewProduct(productTemplate)">
+            Add new <mat-icon>add</mat-icon></button>
+          <p></p>
+          <mat-card-subtitle>Information about addresses</mat-card-subtitle>
+        </mat-card-title>
+
+        <!-- Addresses list -->
+        <mat-grid-list cols="7" rowHeight="40px" style="font-size: x-large; font-weight: bold">
+          <mat-grid-tile [colspan]="2">Name</mat-grid-tile>
+          <mat-grid-tile [colspan]="1">Price</mat-grid-tile>
+          <mat-grid-tile [colspan]="1">Cost</mat-grid-tile>
+          <mat-grid-tile [colspan]="1">Delete</mat-grid-tile>
+
+        </mat-grid-list>
+
+        <div cdkDropList (cdkDropListDropped)="drop($event)" class="drag-list">
+          <mat-grid-list cols="7" rowHeight="30px" *ngFor="let product of products" cdkDrag>
+            <mat-grid-tile [colspan]="2">
+              <input class="input-label drag-box" (dblclick)="changeReadOnly(product)" (blur)="lostFocus(product)"
+                     [(ngModel)]="product.name" [readOnly]="product.name_readonly" id="{{product.id}}-name"
+                     (change)="updateProduct(product)" style="text-align: center;">
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1">
+              <input class="input-label drag-box" (dblclick)="changeReadOnly(product)" (blur)="lostFocus(product)"
+                     [(ngModel)]="product.price" [readOnly]="product.price_readonly" id="{{product.id}}-price"
+                     (change)="updateProduct(product)" style="text-align: center;" type="number">
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1">
+              <input class="input-label drag-box" (dblclick)="changeReadOnly(product)" (blur)="lostFocus(product)"
+                     [(ngModel)]="product.cost" [readOnly]="product.cost_readonly" id="{{product.id}}-cost"
+                     (change)="updateProduct(product)" style="text-align: center;" type="number">
+            </mat-grid-tile>
+            <mat-grid-tile [colspan]="1" class="drag-box">
+              <button mat-icon-button style="margin-left: 10px;" type="button"
+                      (click)="deleteProductById(confirmDeleteModal, product)" >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-grid-tile>
+          </mat-grid-list>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<!-- Template new product -->
+<ng-template #productTemplate let-modal>
+  <div class="modal-content">
+
+      <div class="modal-footer">
+        <input class="form-control" id="newProductName" placeholder="New product name" type="text"
+               [(ngModel)]="newProductName" name="budgetName" (keyup.enter)="modal.close();"
+               autocomplete="off">
+
+        <div>
+          <label for="newProductPrice">New price: </label>
+          <input class="form-control" id="newProductPrice" type="number"
+                 [(ngModel)]="newProductPrice" name="budgetName" (keyup.enter)="modal.close();" autocomplete="off">
+        </div>
+        <div>
+          <label for="newProductCost">New cost: </label>
+          <input class="form-control" id="newProductCost" type="number"
+                 [(ngModel)]="newProductCost" name="budgetName" (keyup.enter)="modal.close();" autocomplete="off">
+        </div>
+
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" type="button" (click)="modal.close();">Add new</button>
+        <button mat-raised-button color="primary" type="button" (click)="modal.dismiss()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template confirm delete product -->
+<ng-template #confirmDeleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Delete Product</h4>
+    <button type="button" mat-icon-button (click)="modal.dismiss('Cross click')">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p><strong>Are you sure you want to delete <span class="text-primary">"{{tempDeleteInformation}}"</span>?</strong></p>
+    <p>All information associated to this product will be permanently deleted. <br>
+      <span class="text-danger">This operation can not be undone.</span>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <button type="button" class="btn btn-danger" (click)="modal.close('Ok click')">Ok</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+    </div>
+
+  </div>
+</ng-template>

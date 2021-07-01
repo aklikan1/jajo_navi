@@ -1,0 +1,158 @@
+<!-- ============================================================== -->
+<!-- row -->
+<!-- ============================================================== -->
+<div fxLayout="row" fxLayoutWrap="wrap">
+  <!-- Card column -->
+  <div fxFlex.gt-sm="100%" fxFlex="100">
+    <mat-card>
+      <mat-card-content class="m-b-0">
+        <mat-card-title>Transport</mat-card-title>
+        <mat-card-subtitle>All information about transport and other bullshit</mat-card-subtitle>
+      </mat-card-content>
+      <div class="container" style="margin-bottom: 5px">
+        <button mat-stroked-button [matMenuTriggerFor]="actEmporium" color="primary">{{actualEmporium.name}}</button>
+        <mat-menu #actEmporium="matMenu">
+          <ng-container *ngFor="let emporium of emporiums">
+            <button mat-menu-item (click)="changeActualEmporium(emporium)">{{emporium.name}}</button>
+          </ng-container>
+        </mat-menu>
+        <button mat-icon-button color="primary" (click)="addNewEmporium(newEmporiumTemplate)">
+          <mat-icon>add_circle_outline</mat-icon></button>
+        <button mat-icon-button color="primary" (click)="deleteEmporiumById(confirmDeleteModal, actualEmporium)">
+          <mat-icon>clear</mat-icon></button>
+      </div>
+      <div class="p-l-20 p-r-20 p-b-20">
+        <mat-tab-group animationDuration="0ms">
+          <mat-tab label="Transport">
+            <div class="" style="margin-top: 10px; margin-bottom: 15px">
+              <button mat-stroked-button style="color: red">New transport</button>
+              <button mat-stroked-button >Add time</button>
+            </div>
+            <div class="">
+                <mat-accordion *ngFor="let transport of transports">
+                  <mat-expansion-panel [disabled]="transport.addButton" (click)="transport.addButton=false"
+                                       class="mat-elevation-z8" [expanded]="transport.id === currentOpenedItemId"
+                                       (opened)="handleOpened(transport)">
+
+                    <mat-expansion-panel-header>
+                      <mat-panel-title class="col-4">
+                        <button (click)="disableShowProductList(transport)" mat-icon-button [matMenuTriggerFor]="addProductToList"
+                                [disabled]="transport.availableProducts.length === 0">
+                          <mat-menu #addProductToList="matMenu">
+                            <ng-container *ngFor="let product of transport.availableProducts">
+                              <button mat-menu-item (click)="addTransportCount(quantityProduct, product, transport)"
+                                      >{{product.name}}</button>
+                            </ng-container>
+                          </mat-menu>
+                          <mat-icon>add_circle_outline</mat-icon>
+                        </button>
+                        <label style="margin-top: 8px">{{transport.address.name}}</label>
+                      </mat-panel-title>
+                      <mat-panel-description class="col-7"> Time: </mat-panel-description>
+                      <mat-panel-description class="col-1">
+                        <button mat-icon-button class="deleteTransportButton" type="button"
+                                (click)="deleteTransportById(confirmDeleteModal, transport); disableShowProductList(transport)" >
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+
+                    <ng-container *ngFor="let count of countsByEmporiumId" class="container">
+                      <table class="col-5">
+                        <tr *ngIf="count.transport.id === transport.id">
+                          <th class="col-1">
+                            <button mat-icon-button class="deleteCountButton" type="button"
+                                    (click)="deleteCountById(count, transport)" >
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </th>
+                          <th class="col-4">
+                            {{count.product.name}}
+                          </th>
+                          <th class="col-1">
+                            {{count.count}}
+                          </th>
+                        </tr>
+                      </table>
+                    </ng-container>
+
+                  </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+
+          </mat-tab>
+          <mat-tab label="Messages">Content 2</mat-tab>
+          <mat-tab label="Money">Content 3</mat-tab>
+          <mat-tab label="Count products">Content 4</mat-tab>
+        </mat-tab-group>
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+<!-- Template new emporium -->
+<ng-template #newEmporiumTemplate let-modal>
+  <div class="modal-content" style="align-items: center">
+    <div class="modal-body">
+      <ngb-datepicker [(ngModel)]="newEmporiumDate"></ngb-datepicker>
+      <div>
+        <button mat-raised-button color="primary" type="button" (click)="modal.close();">Add new</button>
+        <button mat-raised-button color="primary" type="button" (click)="modal.dismiss()" style="float: right">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template new transport -->
+<ng-template #newTransportTemplate let-modal>
+  <div class="modal-content" style="align-items: center">
+    <div class="modal-body">
+      <ngb-datepicker [(ngModel)]="newEmporiumDate"></ngb-datepicker>
+      <div>
+        <button mat-raised-button color="primary" type="button" (click)="modal.close();">Add new</button>
+        <button mat-raised-button color="primary" type="button" (click)="modal.dismiss()" style="float: right">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template quantity product -->
+<ng-template #quantityProduct let-modal>
+  <div class="modal-content">
+
+    <div class="modal-footer">
+      <div>
+        <label for="quantity">Quantity: </label>
+        <input class="form-control" id="quantity" type="number"
+               [(ngModel)]="quantity" name="budgetName" (keyup.enter)="modal.close();" autocomplete="off">
+      </div>
+      <div class="modal-footer">
+        <button mat-raised-button color="primary" type="button" (click)="modal.close();">Add new</button>
+        <button mat-raised-button color="primary" type="button" (click)="modal.dismiss()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template confirm delete -->
+<ng-template #confirmDeleteModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-title">Delete</h4>
+    <button type="button" mat-icon-button (click)="modal.dismiss('Cross click')">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p><strong>Are you sure you want to delete <span class="text-primary">"{{tempDeleteInformation}}"</span>?</strong></p>
+    <p>All information associated will be permanently deleted. <br>
+      <span class="text-danger">This operation can not be undone.</span>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <div>
+      <button type="button" class="btn btn-danger" (click)="modal.close('Ok click')">Ok</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('Cancel Click')">Cancel</button>
+    </div>
+
+  </div>
+</ng-template>
