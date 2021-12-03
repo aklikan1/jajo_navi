@@ -20,5 +20,5 @@ export interface PostTransport {
   address: GetAddress;
   emporium: GetEmporium;
   time: Time;
-  hierarchy: number;
+  message: GetMessage;
 }

@@ -1,11 +1,16 @@
 package jajobackend.controller.database;
 
 import jajobackend.model.Count;
+import jajobackend.model.Message;
 import jajobackend.model.Product;
 import jajobackend.model.Transport;
 import jajobackend.repository.CountRepository;
+import jajobackend.repository.MessageRepository;
 import jajobackend.repository.ProductRepository;
 import jajobackend.repository.TransportRepository;
+
+import java.sql.Time;
+import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @RestController
@@ -24,13 +30,15 @@ public class TransportController {
     private final TransportRepository transportRepository;
     private final CountRepository countRepository;
     private final ProductRepository productRepository;
+    private final MessageRepository messageRepository;
 
     @Autowired
     public TransportController(TransportRepository transportRepository, CountRepository countRepository,
-                               ProductRepository productRepository) {
+                               ProductRepository productRepository, MessageRepository messageRepository) {
         this.transportRepository = transportRepository;
         this.countRepository = countRepository;
         this.productRepository = productRepository;
+        this.messageRepository = messageRepository;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,7 +50,7 @@ public class TransportController {
     @GetMapping(path = "emporium/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Transport>> getTransportsByEmporiumId(@PathVariable Long id) {
 
-        List<Transport> transports = transportRepository.findAllByEmporiumId(id);
+        List<Transport> transports = transportRepository.findAllByEmporiumIdOrderByAddressHierarchyAsc(id);
         transports.forEach(e -> {
             List<Product> tempActualProduct = new ArrayList<>();
             e.setAvailableProducts(productRepository.findAllByOrderByHierarchyAsc());
@@ -60,7 +68,30 @@ public class TransportController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> saveNewTransport(@RequestBody Transport transport) {
+
+        if (transport.getTime() == null) {
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            Date zeroedDate = cal.getTime();
+
+            Time time = new Time(zeroedDate.getTime());
+
+            transport.setTime(time);
+        }
+
+        List<Message> messages = messageRepository.findAll();
+
+        if (transport.getAddress().getIsMrMrs()) {
+            transport.setMessage(messages.get(1));
+        } else {
+            transport.setMessage(messages.get(0));
+        }
+
         Transport save = transportRepository.save(transport);
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("{id}")

@@ -11,5 +11,4 @@ public interface TransportRepository extends JpaRepository<Transport, Long> {
 
     List<Transport> findAllByOrderByAddressHierarchyAsc();
     List<Transport> findAllByEmporiumIdOrderByAddressHierarchyAsc(Long id);
-    List<Transport> findAllByEmporiumId(Long id);
 }

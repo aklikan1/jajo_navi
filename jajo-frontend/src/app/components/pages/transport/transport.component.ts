@@ -3,10 +3,11 @@ import {NgbCalendar, NgbDateStruct, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {GetApiService} from "../../services/database/get-api.service";
 import {PostApiService} from "../../services/database/post-api.service";
 import {DeleteApiService} from "../../services/database/delete-api.service";
-import {GetTransport} from "../../model/transport";
+import {GetTransport, PostTransport} from "../../model/transport";
 import {GetEmporium, PostEmporium} from "../../model/emporium";
 import {GetProduct} from "../../model/product";
 import {GetCount, PostCount} from "../../model/count";
+import {GetAddress} from "../../model/address";
 
 @Component({
   selector: 'app-transport',
@@ -18,6 +19,8 @@ export class TransportComponent implements OnInit {
   public emporiums: GetEmporium[] = [];
   public transports: GetTransport[] = [];
   public allProducts: GetProduct[] = [];
+  public firstHalfTransportAddresses: GetAddress[] = [];
+  public secondTransportHalfAddresses: GetAddress[] = [];
   public countsByEmporiumId: GetCount[] = [];
 
   public actualEmporium: GetEmporium = <GetEmporium>{};
@@ -26,6 +29,8 @@ export class TransportComponent implements OnInit {
   public tempDeleteInformation: string = "";
   public quantity: number = 0;
   public currentOpenedItemId: number = 0;
+
+  public selectedTransportAddresses: GetAddress[] = [];
 
   constructor(private modalService: NgbModal, private getApiService: GetApiService,
               private postApiService: PostApiService, private deleteApiService: DeleteApiService,
@@ -44,7 +49,7 @@ export class TransportComponent implements OnInit {
         let actualEmporiumId = value[0].id;
         this.getAllTransports(actualEmporiumId);
         this.getAllCountsByEmporiumId(actualEmporiumId);
-
+        this.getAllProducts();
       }
     );
   }
@@ -54,6 +59,21 @@ export class TransportComponent implements OnInit {
       value => {
         this.transports = value;
         this.transports.forEach(x => x.addButton = false);
+
+        this.getAddressesWithoutExisting(emporiumId);
+      }
+    );
+  }
+
+  getAddressesWithoutExisting(emporiumId: number) {
+    this.getApiService.getAvailableAddresses(emporiumId).subscribe(
+      value => {
+        let newAddresses: GetAddress[] = [];
+        newAddresses = value;
+
+        let halfAddresses = Math.ceil(newAddresses.length / 2);
+        this.firstHalfTransportAddresses = newAddresses.slice(0, halfAddresses);
+        this.secondTransportHalfAddresses = newAddresses.slice(halfAddresses, newAddresses.length);
       }
     );
   }
@@ -62,6 +82,14 @@ export class TransportComponent implements OnInit {
     this.getApiService.getAllCountsByEmporiumId(emporiumId).subscribe(
       value => {
         this.countsByEmporiumId = value;
+      }
+    );
+  }
+
+  getAllProducts() {
+    this.getApiService.getAllProducts().subscribe(
+      value => {
+        this.allProducts = value;
       }
     );
   }
@@ -110,8 +138,44 @@ export class TransportComponent implements OnInit {
         this.actualEmporium=this.emporiums[0];
         this.getAllTransports(this.actualEmporium.id);
         this.getAllCountsByEmporiumId(this.actualEmporium.id);
-      }
+      },
+      () => {}
     );
+  }
+
+  addNewTransports(newTransportTemplate: TemplateRef<any>) {
+    this.modalService.open(newTransportTemplate, {backdrop: false}).result.then(
+      () => {
+        this.selectedTransportAddresses.forEach(
+          item => {
+            let newTempTransport: PostTransport = <PostTransport>{};
+            newTempTransport.address = item;
+            newTempTransport.emporium = this.actualEmporium;
+
+            this.postApiService.postTransport(newTempTransport).subscribe(
+              value => {
+                let newPushTransport: GetTransport = <GetTransport>{};
+                newPushTransport.id = value.id;
+                newPushTransport.address = value.address;
+                newPushTransport.addButton = false;
+                newPushTransport.time = value.time;
+                newPushTransport.emporium = value.emporium;
+                newPushTransport.message = value.message;
+                newPushTransport.actualProducts = [];
+                newPushTransport.availableProducts = this.allProducts;
+                this.transports.push(newPushTransport);
+
+                this.sortTransportsByAddressHierarchy();
+              }
+            );
+          }
+        );
+      },
+      () => {}
+    );
+
+    this.selectedTransportAddresses=[];
+    this.getAddressesWithoutExisting(this.actualEmporium.id);
   }
 
   deleteTransportById(confirmDeleteModal: TemplateRef<any>, transport: GetTransport) {
@@ -162,6 +226,13 @@ export class TransportComponent implements OnInit {
       }
     );
   }
+
+  sortTransportsByAddressHierarchy () {
+    this.transports = this.transports.sort(function (a, b) {
+      return a.address.hierarchy - b.address.hierarchy;
+    });
+  }
+
 }
 
 

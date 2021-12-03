@@ -6,6 +6,7 @@ import {Observable} from "rxjs";
 import {PostProduct} from "../../model/product";
 import {PostEmporium} from "../../model/emporium";
 import {PostCount} from "../../model/count";
+import {PostTransport} from "../../model/transport";
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class PostApiService {
   private POST_PRODUCT = `${this.baseUrl.baseUrl}\\products`;
   private POST_EMPORIUM = `${this.baseUrl.baseUrl}\\emporium`;
   private POST_COUNT = `${this.baseUrl.baseUrl}\\count`
+  private POST_TRANSPORT = `${this.baseUrl.baseUrl}\\transport`
 
   constructor(private http: HttpClient, private baseUrl: BaseUrlService) {}
 
@@ -35,5 +37,9 @@ export class PostApiService {
 
   postCount(count: PostCount): Observable<any> {
     return this.http.post(this.POST_COUNT, count);
+  }
+
+  postTransport(transport: PostTransport): Observable<any> {
+    return this.http.post(this.POST_TRANSPORT, transport);
   }
 }

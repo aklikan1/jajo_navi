@@ -7,18 +7,22 @@ import {GetProduct} from "../../model/product";
 import {GetTransport} from "../../model/transport";
 import {GetEmporium} from "../../model/emporium";
 import {GetCount} from "../../model/count";
+import {Message} from "@angular/compiler/src/i18n/i18n_ast";
+import {GetMessage} from "../../model/message";
 
 @Injectable({
   providedIn: 'root'
 })
 export class GetApiService {
 
-  private GET_ALL_ADDRESSES = `${this.baseUrl.baseUrl}\\address`
+  private GET_ALL_ADDRESSES = `${this.baseUrl.baseUrl}\\address`;
+  private GET_AVAILABLE_ADDRESSES = `${this.GET_ALL_ADDRESSES}\\available\\emporium\\`;
   private GET_ALL_PRODUCTS = `${this.baseUrl.baseUrl}\\products`;
   private GET_ALL_TRANSPORTS = `${this.baseUrl.baseUrl}\\transport`;
   private GET_ALL_TRANSPORTS_BY_EMPORIUM_ID = `${this.baseUrl.baseUrl}\\transport\\emporium\\`;
   private GET_ALL_EMPORIUMS = `${this.baseUrl.baseUrl}\\emporium`;
   private GET_ALL_COUNTS_BY_EMPORIUM_ID = `${this.baseUrl.baseUrl}\\count\\emporium\\`;
+  private GET_ALL_MESSAGES = `${this.baseUrl.baseUrl}\\message` ;
 
   constructor(private http: HttpClient, private baseUrl: BaseUrlService) { }
 
@@ -26,6 +30,10 @@ export class GetApiService {
 
   getAllAddresses () : Observable<GetAddress[]> {
     return this.http.get<GetAddress[]>(this.GET_ALL_ADDRESSES);
+  }
+
+  getAvailableAddresses (id: number) : Observable<GetAddress[]> {
+    return this.http.get<GetAddress[]>(this.GET_AVAILABLE_ADDRESSES+id);
   }
 
   getAllProducts(): Observable<GetProduct[]> {
@@ -46,5 +54,9 @@ export class GetApiService {
 
   getAllCountsByEmporiumId(id: number): Observable<GetCount[]> {
     return this.http.get<GetCount[]>(this.GET_ALL_COUNTS_BY_EMPORIUM_ID+id);
+  }
+
+  getAllMessages() : Observable<GetMessage[]> {
+    return this.http.get<GetMessage[]>(this.GET_ALL_MESSAGES);
   }
 }

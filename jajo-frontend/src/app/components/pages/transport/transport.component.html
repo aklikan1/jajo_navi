@@ -23,11 +23,15 @@
       </div>
       <div class="p-l-20 p-r-20 p-b-20">
         <mat-tab-group animationDuration="0ms">
+          <!-- Zakładka: transport -->
           <mat-tab label="Transport">
+            <!-- Przyciski: dodaj transport i dodaj czas -->
             <div class="" style="margin-top: 10px; margin-bottom: 15px">
-              <button mat-stroked-button style="color: red">New transport</button>
+              <button mat-stroked-button style="color: red" (click)="addNewTransports(newTransportAddressTemplate)" >New transport</button>
+              <button mat-stroked-button >Auto time</button>
               <button mat-stroked-button >Add time</button>
             </div>
+
             <div class="">
                 <mat-accordion *ngFor="let transport of transports">
                   <mat-expansion-panel [disabled]="transport.addButton" (click)="transport.addButton=false"
@@ -48,7 +52,7 @@
                         </button>
                         <label style="margin-top: 8px">{{transport.address.name}}</label>
                       </mat-panel-title>
-                      <mat-panel-description class="col-7"> Time: </mat-panel-description>
+                      <mat-panel-description class="col-7"> Time: {{transport.time}}</mat-panel-description>
                       <mat-panel-description class="col-1">
                         <button mat-icon-button class="deleteTransportButton" type="button"
                                 (click)="deleteTransportById(confirmDeleteModal, transport); disableShowProductList(transport)" >
@@ -104,15 +108,26 @@
 </ng-template>
 
 <!-- Template new transport -->
-<ng-template #newTransportTemplate let-modal>
+<ng-template #newTransportAddressTemplate let-modal>
   <div class="modal-content" style="align-items: center">
-    <div class="modal-body">
-      <ngb-datepicker [(ngModel)]="newEmporiumDate"></ngb-datepicker>
-      <div>
-        <button mat-raised-button color="primary" type="button" (click)="modal.close();">Add new</button>
-        <button mat-raised-button color="primary" type="button" (click)="modal.dismiss()" style="float: right">Cancel</button>
-      </div>
+    <div class="modal-header">
+      <button mat-raised-button color="primary" type="button" (click)="modal.close();">Add new</button>
+      <button mat-raised-button color="primary" type="button" (click)="modal.dismiss()" style="float: right">Cancel</button>
     </div>
+    <div class="col-12">
+      <mat-selection-list [(ngModel)]="selectedTransportAddresses">
+        <div class="col-6" style="float: left">
+          <mat-list-option *ngFor="let address of firstHalfTransportAddresses" [value]="address">
+            {{address.name}}
+          </mat-list-option>
+        </div>
+        <div class="col-6" style="float: right">
+          <mat-list-option *ngFor="let address of secondTransportHalfAddresses" [value]="address">
+            {{address.name}}
+          </mat-list-option>
+        </div>
+        </mat-selection-list>
+      </div>
   </div>
 </ng-template>
 
