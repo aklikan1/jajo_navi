@@ -6,6 +6,7 @@ export interface GetCount {
   count: number;
   transport: GetTransport;
   product: GetProduct;
+  readonly: boolean;
 }
 
 export interface PostCount {

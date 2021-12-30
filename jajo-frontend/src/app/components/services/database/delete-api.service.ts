@@ -12,6 +12,7 @@ export class DeleteApiService {
   private DELETE_PRODUCT_BY_ID = `${this.baseUrl.baseUrl}\\products\\`;
   private DELETE_EMPORIUM_BY_ID = `${this.baseUrl.baseUrl}\\emporium\\`;
   private DELETE_COUNT_BY_ID = `${this.baseUrl.baseUrl}\\count\\`
+  private DELETE_TRANSPORT_BY_ID = `${this.baseUrl.baseUrl}\\transport\\`
 
   constructor(private baseUrl: BaseUrlService, private http: HttpClient) { }
 
@@ -29,5 +30,9 @@ export class DeleteApiService {
 
   deleteCountById (id: number): Observable<any> {
     return this.http.delete<any>(this.DELETE_COUNT_BY_ID+id);
+  }
+
+  deleteTransportById (id: number): Observable<any> {
+    return this.http.delete<any>(this.DELETE_TRANSPORT_BY_ID+id);
   }
 }

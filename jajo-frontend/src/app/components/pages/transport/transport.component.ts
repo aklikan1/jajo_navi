@@ -1,5 +1,7 @@
 import {Component, OnInit, TemplateRef} from '@angular/core';
 import {NgbCalendar, NgbDateStruct, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {DateTime} from "luxon";
+
 import {GetApiService} from "../../services/database/get-api.service";
 import {PostApiService} from "../../services/database/post-api.service";
 import {DeleteApiService} from "../../services/database/delete-api.service";
@@ -27,6 +29,7 @@ export class TransportComponent implements OnInit {
 
   public newEmporiumDate: NgbDateStruct = <NgbDateStruct>{};
   public tempDeleteInformation: string = "";
+  public tempEndTimeShift: any;
   public quantity: number = 0;
   public currentOpenedItemId: number = 0;
 
@@ -82,6 +85,7 @@ export class TransportComponent implements OnInit {
     this.getApiService.getAllCountsByEmporiumId(emporiumId).subscribe(
       value => {
         this.countsByEmporiumId = value;
+        this.countsByEmporiumId.forEach(x => x.readonly = true);
       }
     );
   }
@@ -92,6 +96,41 @@ export class TransportComponent implements OnInit {
         this.allProducts = value;
       }
     );
+  }
+
+  addNewTransports(newTransportTemplate: TemplateRef<any>) {
+    this.modalService.open(newTransportTemplate, {backdrop: false}).result.then(
+      () => {
+        this.selectedTransportAddresses.forEach(
+          item => {
+            let newTempTransport: PostTransport = <PostTransport>{};
+            newTempTransport.address = item;
+            newTempTransport.emporium = this.actualEmporium;
+
+            this.postApiService.postTransport(newTempTransport).subscribe(
+              value => {
+                let newPushTransport: GetTransport = <GetTransport>{};
+                newPushTransport.id = value.id;
+                newPushTransport.address = value.address;
+                newPushTransport.addButton = false;
+                newPushTransport.time = value.time;
+                newPushTransport.emporium = value.emporium;
+                newPushTransport.message = value.message;
+                newPushTransport.actualProducts = [];
+                newPushTransport.availableProducts = this.allProducts;
+                this.transports.push(newPushTransport);
+
+                this.sortTransportsByAddressHierarchy();
+              }
+            );
+          }
+        );
+      },
+      () => {}
+    );
+
+    this.selectedTransportAddresses=[];
+    this.getAddressesWithoutExisting(this.actualEmporium.id);
   }
 
   changeActualEmporium(emporium: GetEmporium) {
@@ -143,43 +182,20 @@ export class TransportComponent implements OnInit {
     );
   }
 
-  addNewTransports(newTransportTemplate: TemplateRef<any>) {
-    this.modalService.open(newTransportTemplate, {backdrop: false}).result.then(
+  deleteTransportById(confirmDeleteModal: TemplateRef<any>, transport: GetTransport) {
+    this.tempDeleteInformation = transport.address.name;
+    let id = transport.id;
+    this.modalService.open(confirmDeleteModal, {backdrop: false}).result.then(
       () => {
-        this.selectedTransportAddresses.forEach(
-          item => {
-            let newTempTransport: PostTransport = <PostTransport>{};
-            newTempTransport.address = item;
-            newTempTransport.emporium = this.actualEmporium;
-
-            this.postApiService.postTransport(newTempTransport).subscribe(
-              value => {
-                let newPushTransport: GetTransport = <GetTransport>{};
-                newPushTransport.id = value.id;
-                newPushTransport.address = value.address;
-                newPushTransport.addButton = false;
-                newPushTransport.time = value.time;
-                newPushTransport.emporium = value.emporium;
-                newPushTransport.message = value.message;
-                newPushTransport.actualProducts = [];
-                newPushTransport.availableProducts = this.allProducts;
-                this.transports.push(newPushTransport);
-
-                this.sortTransportsByAddressHierarchy();
-              }
-            );
+        this.deleteApiService.deleteTransportById(id).subscribe(
+          value => {
+            this.transports = this.transports.filter((obj => obj !== transport));
           }
         );
+
       },
       () => {}
-    );
-
-    this.selectedTransportAddresses=[];
-    this.getAddressesWithoutExisting(this.actualEmporium.id);
-  }
-
-  deleteTransportById(confirmDeleteModal: TemplateRef<any>, transport: GetTransport) {
-
+    )
   }
 
 
@@ -215,6 +231,10 @@ export class TransportComponent implements OnInit {
     );
   }
 
+  updateCountById(count: GetCount) {
+    this.postApiService.postCount(count).subscribe();
+  }
+
   deleteCountById( count: GetCount, transport: GetTransport) {
     this.tempDeleteInformation = count.product.name;
     let id = count.id;
@@ -227,12 +247,76 @@ export class TransportComponent implements OnInit {
     );
   }
 
+
+  autoTime(maxEndShift: TemplateRef<any>) {
+    let dateTime = DateTime.now();
+    let constTime: number = 15;
+
+    this.tempEndTimeShift = (dateTime.hour<9? "0"+dateTime.hour:dateTime.hour)+":"+("0"+dateTime.minute).slice(-2);
+    let tempTransport: GetTransport = <GetTransport>{};
+    this.modalService.open(maxEndShift, {backdrop: false}).result.then(
+      () => {
+        this.transports.forEach((value, index, array)=> {
+            let tempTimeBetweenTransports: number = (array.length-index-1)*constTime;
+          let inputTime: DateTime = DateTime.fromObject({hour: parseInt(this.tempEndTimeShift.slice(0, 2)),
+            minute: parseInt(this.tempEndTimeShift.slice(-2))}).minus({minutes: tempTimeBetweenTransports});
+
+          tempTransport = value;
+          tempTransport.time = inputTime.toSQLTime().substring(0, 8);
+
+          this.postApiService.postTransport(tempTransport).subscribe();
+          });
+      },
+      () => {}
+    );
+  }
+
+  plusOrMinusFifteenMinutes(transport: GetTransport, type: string) {
+    let tempTransport: GetTransport = <GetTransport>{};
+
+    this.transports.forEach(value => {
+
+      if (value.address.hierarchy >= transport.address.hierarchy) {
+        tempTransport = value;
+        if (type === 'plus') {
+          tempTransport.time = tempTimeShiftPlus().toSQLTime().substring(0, 8);
+        }
+
+        if (type === 'minus') {
+          tempTransport.time = tempTimeShiftMinus().toSQLTime().substring(0, 8);
+        }
+        this.postApiService.postTransport(tempTransport).subscribe();
+      }
+    });
+
+    function tempTimeShiftPlus () {
+      return DateTime.fromObject({
+        hour: parseInt(tempTransport.time.substring(0, 2)),
+        minute: parseInt(tempTransport.time.substring(5, 3))
+      }).plus({minutes: 15});
+    }
+
+    function tempTimeShiftMinus () {
+      return DateTime.fromObject({
+        hour: parseInt(tempTransport.time.substring(0, 2)),
+        minute: parseInt(tempTransport.time.substring(5, 3))
+      }).minus({minutes: 15});
+    }
+  }
+
   sortTransportsByAddressHierarchy () {
     this.transports = this.transports.sort(function (a, b) {
       return a.address.hierarchy - b.address.hierarchy;
     });
   }
 
+  changeReadOnly(count: GetCount) {
+    count.readonly = false;
+  }
+
+  lostFocus(count: GetCount) {
+    count.readonly = true;
+  }
 }
 
 

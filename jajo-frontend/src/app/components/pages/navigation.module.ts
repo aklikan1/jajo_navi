@@ -22,13 +22,15 @@ import {MatMenuModule} from "@angular/material/menu";
 import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
+import { MainTransportsComponent } from './transport/mainTransports/mainTransports.component';
 
 
 @NgModule({
   declarations: [
     TransportComponent,
     AddressComponent,
-    ProductsComponent
+    ProductsComponent,
+    MainTransportsComponent
   ],
     imports: [
         CommonModule,
