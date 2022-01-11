@@ -18,6 +18,8 @@ public class Emporium {
 
     private String name;
 
+    private Boolean isSunday;
+
     //One to Many
     @OneToMany (mappedBy = "emporium")
     @JsonIgnore

@@ -16,15 +16,12 @@ public class Message {
     @Column(name = "message_id")
     Long id;
 
-    @Column(nullable = false)
-    String name;
-
     @Column (nullable = false, length = 500)
     String message;
 
-    // One to Many
-    @OneToMany (mappedBy = "message")
-    @JsonIgnore
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    private List<Transport> transports;
+    @Column (nullable = false)
+    Boolean isMrMrs;
+
+    @Column (nullable = false)
+    Boolean isSunday;
 }

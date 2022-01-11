@@ -18,17 +18,55 @@
         </mat-menu>
         <button mat-icon-button color="primary" (click)="addNewEmporium(newEmporiumTemplate)">
           <mat-icon>add_circle_outline</mat-icon></button>
-        <button mat-icon-button color="primary" (click)="deleteEmporiumById(confirmDeleteModal, actualEmporium)">
+        <button mat-icon-button color="primary" (click)="deleteEmporiumById(confirmDeleteModal, actualEmporium)"
+                [disabled]="emporiums.length === 1">
           <mat-icon>clear</mat-icon></button>
       </div>
       <div class="p-l-20 p-r-20 p-b-20">
         <mat-tab-group animationDuration="0ms">
-          <!-- Zakładka: transport -->
+          <!-- Zakładka: Transport -->
           <mat-tab label="Transport">
-            <app-mainTransports [actualEmporium]="actualEmporium" ></app-mainTransports>
+            <app-mainTransports [actualEmporium]="actualEmporium"
+                                (refreshAllTransports)="refreshAllTransportsFromMainTransports($event)">
+            </app-mainTransports>
           </mat-tab>
-          <mat-tab label="Messages">Content 2</mat-tab>
+
+          <!-- Zakładka: Messages -->
+          <mat-tab label="Messages">
+
+            <div class="modal-body">
+              <mat-slide-toggle [checked]="actualEmporium.isSunday" (change)="changeSundayOption()">Sunday message</mat-slide-toggle>
+            </div>
+
+            <div class="">
+              <mat-list role="list" *ngFor="let transport of allTransports">
+                  <mat-list-item role="listitem" [id]="transport.id+'_sent'"
+                                 [ngStyle]="{'background-color': transport.isSent? 'LightGreen' : 'transparent'}">
+                    <div class="row col-12">
+                      <div class="col">
+                        <p style="font-weight: bold">{{transport.address.name}}</p>
+                      </div>
+                      <div class="col">
+                        {{transport.message}}
+                      </div>
+                      <div class="col text-end">
+                        <button class="button" mat-icon-button [cdkCopyToClipboard]="transport.message">
+                          <mat-icon>file_copy</mat-icon>
+                        </button>
+                        <mat-checkbox [checked]="transport.isSent" (change)="changeSendMessage(transport)"></mat-checkbox>
+                      </div>
+
+                    </div>
+                  </mat-list-item>
+              </mat-list>
+            </div>
+
+          </mat-tab>
+
+          <!-- Zakładka: Money -->
           <mat-tab label="Money">Content 3</mat-tab>
+
+          <!-- Zakładka: Count products -->
           <mat-tab label="Count products">Content 4</mat-tab>
         </mat-tab-group>
       </div>

@@ -23,6 +23,9 @@ import {NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import { MainTransportsComponent } from './transport/mainTransports/mainTransports.component';
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {ClipboardModule} from "@angular/cdk/clipboard";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 
 @NgModule({
@@ -52,7 +55,10 @@ import { MainTransportsComponent } from './transport/mainTransports/mainTranspor
         MatMenuModule,
         NgbModule,
         MatExpansionModule,
-        MatFormFieldModule
+        MatFormFieldModule,
+        MatSlideToggleModule,
+        ClipboardModule,
+        MatTooltipModule
 
     ]
 })

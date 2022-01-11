@@ -1,19 +1,17 @@
 import {GetAddress} from "./address";
-import {Time} from "@angular/common";
 import {GetEmporium} from "./emporium";
-import {GetMessage} from "./message";
 import {GetProduct} from "./product";
-import {DateTime} from "luxon";
 
 export interface GetTransport {
   id: number;
   address: GetAddress;
   emporium: GetEmporium;
-  message: GetMessage;
+  message: string;
   time: string;
   addButton: boolean;
   actualProducts: GetProduct[];
   availableProducts: GetProduct[];
+  isSent: boolean;
 }
 
 export interface PostTransport {
@@ -21,5 +19,5 @@ export interface PostTransport {
   address: GetAddress;
   emporium: GetEmporium;
   time: string;
-  message: GetMessage;
+  isSent: boolean;
 }

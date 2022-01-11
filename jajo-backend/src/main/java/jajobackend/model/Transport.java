@@ -23,6 +23,9 @@ public class Transport {
     @Column(length = 5, nullable = false)
     private Time time;
 
+    @Column (nullable = false)
+    private Boolean isSent;
+
     @Transient
     private List<Product> actualProducts;
 
@@ -43,8 +46,4 @@ public class Transport {
     @ManyToOne
     @JoinColumn(name = "emporium_id")
     private Emporium emporium;
-
-    @ManyToOne
-    @JoinColumn(name = "message_id")
-    private Message message;
 }

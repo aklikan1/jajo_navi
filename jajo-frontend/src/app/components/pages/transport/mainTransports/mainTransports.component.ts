@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output, TemplateRef} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, TemplateRef} from '@angular/core';
 import {GetTransport, PostTransport} from "../../../model/transport";
 import {NgbCalendar, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {GetApiService} from "../../../services/database/get-api.service";
@@ -25,8 +25,10 @@ export class MainTransportsComponent implements OnInit {
   public quantity: number = 0;
 
   @Input() public actualEmporium: GetEmporium = <GetEmporium>{};
-  public allProducts: GetProduct[] = [];
+  @Output() public refreshAllTransports = new EventEmitter <GetTransport[]>();
+
   public transports: GetTransport[] = [];
+  public allProducts: GetProduct[] = [];
   public firstHalfTransportAddresses: GetAddress[] = [];
   public secondTransportHalfAddresses: GetAddress[] = [];
   public countsByEmporiumId: GetCount[] = [];
@@ -43,6 +45,8 @@ export class MainTransportsComponent implements OnInit {
       value => {
         this.transports = value;
         this.transports.forEach(x => x.addButton = false);
+
+        this.refreshAllTransports.emit(this.transports);
 
         this.getAddressesWithoutExisting(emporiumId);
       }
@@ -99,9 +103,12 @@ export class MainTransportsComponent implements OnInit {
                 newPushTransport.message = value.message;
                 newPushTransport.actualProducts = [];
                 newPushTransport.availableProducts = this.allProducts;
+                newPushTransport.isSent = false;
                 this.transports.push(newPushTransport);
 
                 this.sortTransportsByAddressHierarchy();
+
+                this.refreshAllTransports.emit(this.transports);
               }
             );
           }
@@ -122,6 +129,8 @@ export class MainTransportsComponent implements OnInit {
         this.deleteApiService.deleteTransportById(id).subscribe(
           value => {
             this.transports = this.transports.filter((obj => obj !== transport));
+
+            this.refreshAllTransports.emit(this.transports);
           }
         );
 
@@ -197,6 +206,8 @@ export class MainTransportsComponent implements OnInit {
 
           this.postApiService.postTransport(tempTransport).subscribe();
         });
+
+        this.refreshAllTransports.emit(this.transports);
       },
       () => {}
     );
@@ -219,6 +230,8 @@ export class MainTransportsComponent implements OnInit {
         this.postApiService.postTransport(tempTransport).subscribe();
       }
     });
+
+    this.refreshAllTransports.emit(this.transports);
 
     function tempTimeShiftPlus () {
       return DateTime.fromObject({

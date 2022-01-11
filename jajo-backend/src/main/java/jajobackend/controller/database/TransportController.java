@@ -30,15 +30,13 @@ public class TransportController {
     private final TransportRepository transportRepository;
     private final CountRepository countRepository;
     private final ProductRepository productRepository;
-    private final MessageRepository messageRepository;
 
     @Autowired
     public TransportController(TransportRepository transportRepository, CountRepository countRepository,
-                               ProductRepository productRepository, MessageRepository messageRepository) {
+                               ProductRepository productRepository) {
         this.transportRepository = transportRepository;
         this.countRepository = countRepository;
         this.productRepository = productRepository;
-        this.messageRepository = messageRepository;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,12 +80,8 @@ public class TransportController {
             transport.setTime(time);
         }
 
-        List<Message> messages = messageRepository.findAll();
-
-        if (transport.getAddress().getIsMrMrs()) {
-            transport.setMessage(messages.get(1));
-        } else {
-            transport.setMessage(messages.get(0));
+        if (transport.getIsSent() == null) {
+            transport.setIsSent(false);
         }
 
         Transport save = transportRepository.save(transport);

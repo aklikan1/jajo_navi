@@ -13,7 +13,7 @@
 
       <!-- Szczegół każdego z transportu -->
       <mat-expansion-panel-header>
-        <mat-panel-title class="col-2">
+        <mat-panel-title class="col-3">
 
           <!-- Przycisk do dodania towaru dla transportu -->
           <button (click)="disableShowProductList(transport)" mat-icon-button [matMenuTriggerFor]="addProductToList"
@@ -28,6 +28,7 @@
           </button>
           <label style="margin-top: 10px">{{transport.address.name}}</label>
         </mat-panel-title>
+
         <mat-panel-description class="col-2">
           <p style="padding-top: 10px">Time: {{transport.time.substring(0, 5)}}</p>
           <button mat-icon-button class="" type="button"
@@ -39,8 +40,9 @@
             <mat-icon>remove</mat-icon>
           </button>
         </mat-panel-description>
+
         <mat-panel-description class="col-5"></mat-panel-description>
-        <mat-panel-description class="col-1" style="align-items: center">
+        <mat-panel-description class="" style="align-items: center">
           <button mat-icon-button class="deleteTransportButton" type="button"
                   (click)="deleteTransportById(confirmDeleteModal, transport); disableShowProductList(transport)" >
             <mat-icon>delete</mat-icon>
