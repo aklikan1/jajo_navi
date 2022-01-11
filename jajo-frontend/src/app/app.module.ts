@@ -17,8 +17,6 @@ import { DemoMaterialModule } from './demo-material-module';
 
 import { SharedModule } from './components/shared/shared.module';
 import { SpinnerComponent } from './components/shared/spinner.component';
-import {MatSliderModule} from "@angular/material/slider";
-import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
   declarations: [
