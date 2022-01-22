@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output, TemplateRef} from '@angular/core';
 import {GetTransport, PostTransport} from "../../../model/transport";
-import {NgbCalendar, NgbModal} from "@ng-bootstrap/ng-bootstrap";
+import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {GetApiService} from "../../../services/database/get-api.service";
 import {PostApiService} from "../../../services/database/post-api.service";
 import {DeleteApiService} from "../../../services/database/delete-api.service";
@@ -36,9 +36,7 @@ export class MainTransportsComponent implements OnInit {
   constructor(private modalService: NgbModal, private getApiService: GetApiService,
               private postApiService: PostApiService, private deleteApiService: DeleteApiService) { }
 
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void {}
 
   getAllTransports(emporiumId: number) {
     this.getApiService.getAllTransportsByEmporiumId(emporiumId).subscribe(
@@ -56,7 +54,7 @@ export class MainTransportsComponent implements OnInit {
   getAddressesWithoutExisting(emporiumId: number) {
     this.getApiService.getAvailableAddresses(emporiumId).subscribe(
       value => {
-        let newAddresses: GetAddress[] = [];
+        let newAddresses: GetAddress[];
         newAddresses = value;
 
         let halfAddresses = Math.ceil(newAddresses.length / 2);
@@ -127,7 +125,7 @@ export class MainTransportsComponent implements OnInit {
     this.modalService.open(confirmDeleteModal, {backdrop: false}).result.then(
       () => {
         this.deleteApiService.deleteTransportById(id).subscribe(
-          value => {
+          () => {
             this.transports = this.transports.filter((obj => obj !== transport));
 
             this.refreshAllTransports.emit(this.transports);
@@ -165,6 +163,8 @@ export class MainTransportsComponent implements OnInit {
             this.countsByEmporiumId.sort((n1, n2) => n1.product.hierarchy - n2.product.hierarchy);
 
             transport.availableProducts = transport.availableProducts.filter( obj => obj !== product);
+
+            this.getAllTransports(this.actualEmporium.id);
           }
         );
       }
@@ -172,7 +172,12 @@ export class MainTransportsComponent implements OnInit {
   }
 
   updateCountById(count: GetCount) {
-    this.postApiService.postCount(count).subscribe();
+    this.postApiService.postCount(count).subscribe(
+      () => {
+        this.getAllTransports(this.actualEmporium.id);
+      }
+    );
+
   }
 
   deleteCountById( count: GetCount, transport: GetTransport) {
@@ -183,6 +188,8 @@ export class MainTransportsComponent implements OnInit {
         this.countsByEmporiumId = this.countsByEmporiumId.filter(obj => obj !== count);
         transport.availableProducts.push(count.product);
         transport.availableProducts.sort((n1, n2) => n1.hierarchy - n2.hierarchy);
+
+        this.getAllTransports(this.actualEmporium.id);
       }
     );
   }

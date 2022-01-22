@@ -1,13 +1,12 @@
 import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
-import {NgbCalendar, NgbDateStruct, NgbModal, NgbTooltip} from "@ng-bootstrap/ng-bootstrap";
+import {NgbCalendar, NgbDateStruct, NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {GetApiService} from "../../services/database/get-api.service";
 import {PostApiService} from "../../services/database/post-api.service";
 import {DeleteApiService} from "../../services/database/delete-api.service";
 import {GetEmporium, PostEmporium} from "../../model/emporium";
 import {MainTransportsComponent} from "./mainTransports/mainTransports.component";
 import {GetTransport} from "../../model/transport";
-import {GetMessage} from "../../model/message";
-import {delay} from "rxjs/operators";
+import {MessageTransportsComponent} from "./message-transports/message-transports.component";
 
 @Component({
   selector: 'app-transport',
@@ -17,24 +16,21 @@ import {delay} from "rxjs/operators";
 export class TransportComponent implements OnInit {
 
   public emporiums: GetEmporium[] = [];
+  public allTransports: GetTransport[] = [];
 
   public actualEmporium: GetEmporium = <GetEmporium>{};
-
-  // Messages values
-  public allTransports: GetTransport[] = [];
-  public allMessages: GetMessage[] = [];
 
   public newEmporiumDate: NgbDateStruct = <NgbDateStruct>{};
   public tempDeleteInformation: string = "";
 
   @ViewChild(MainTransportsComponent) private mainTransportsComponent!: MainTransportsComponent;
+  @ViewChild(MessageTransportsComponent) private messageTransportsComponent!: MessageTransportsComponent;
 
   constructor(private modalService: NgbModal, private getApiService: GetApiService,
               private postApiService: PostApiService, private deleteApiService: DeleteApiService,
               private calendar: NgbCalendar) { }
 
   ngOnInit(): void {
-    this.getAllMessages();
     this.getAllEmporiums();
   }
 
@@ -48,8 +44,6 @@ export class TransportComponent implements OnInit {
         this.mainTransportsComponent.getAllTransports(actualEmporiumId);
         this.mainTransportsComponent.getAllCountsByEmporiumId(actualEmporiumId);
         this.mainTransportsComponent.getAllProducts();
-
-        //this.getAllTransports(this.actualEmporium.id);
       }
     );
   }
@@ -59,8 +53,6 @@ export class TransportComponent implements OnInit {
 
     this.mainTransportsComponent.getAllTransports(emporium.id);
     this.mainTransportsComponent.getAllCountsByEmporiumId(emporium.id);
-
-    //this.getAllTransports(emporium.id);
   }
 
   addNewEmporium(content: TemplateRef<any>) {
@@ -85,7 +77,6 @@ export class TransportComponent implements OnInit {
             this.actualEmporium = value;
 
             this.mainTransportsComponent.transports = [];
-            this.allTransports = [];
           },
           error => {console.error("Error in addNewEmporium()"+error)}
         );
@@ -107,89 +98,23 @@ export class TransportComponent implements OnInit {
         this.mainTransportsComponent.getAllTransports(this.actualEmporium.id);
         this.mainTransportsComponent.getAllCountsByEmporiumId(this.actualEmporium.id);
 
-        //this.getAllTransports(this.actualEmporium.id);
       },
       () => {}
     );
   }
 
-  //Messages Tab
-/*
-  getAllTransports(emporiumId: number) {
-    this.getApiService.getAllTransportsByEmporiumId(emporiumId).subscribe(
-      value => {
-        this.allTransports = value;
-      }
-    );
-  }
+  //Parent data from children emits
 
- */
+  //Message emits
 
-  getAllMessages() {
-    this.getApiService.getAllMessages().subscribe(
-      value => {
-        this.allMessages = value;
-      }
-    );
-  }
-
-  changeSundayOption() {
-    let isSundayInActualEmporium: boolean = this.actualEmporium.isSunday;
-    let tempEmporium = this.actualEmporium;
-    if (!isSundayInActualEmporium) {
-      tempEmporium.isSunday = true;
-      this.postApiService.postEmporium(tempEmporium).subscribe(
-        value => {
-          this.actualEmporium = value;
-          this.mainTransportsComponent.getAllTransports(this.actualEmporium.id);
-        }
-      );
-    } else {
-      tempEmporium.isSunday = false;
-      this.postApiService.postEmporium(tempEmporium).subscribe(
-        value => {
-          this.actualEmporium = value;
-          this.mainTransportsComponent.getAllTransports(this.actualEmporium.id);
-        }
-      );
-    }
-  }
-
-  createMessages () {
-    let isSunday: boolean = this.actualEmporium.isSunday;
-
-    this.allTransports.forEach(value => {
-      let isMrMrs: boolean = value.address.isMrMrs;
-
-      if (!isSunday && !isMrMrs) {
-        value.message = this.allMessages.find(obj => !obj.isSunday && !obj.isMrMrs)!.message + value.time.substring(5, -2);
-      }
-      if (isSunday && !isMrMrs) {
-        value.message = this.allMessages.find(obj => obj.isSunday && !obj.isMrMrs)!.message + value.time.substring(5, -2);
-      }
-      if (!isSunday && isMrMrs) {
-        value.message = this.allMessages.find(obj => !obj.isSunday && obj.isMrMrs)!.message + value.time.substring(5, -2);
-      }
-      if (isSunday && isMrMrs) {
-        value.message = this.allMessages.find(obj => obj.isSunday && obj.isMrMrs)!.message + value.time.substring(5, -2);
-      }
-    });
-  }
-
-  refreshAllTransportsFromMainTransports($event: GetTransport[]) {
+  changeSundayOption($event: GetTransport[]) {
     this.allTransports = $event;
 
-    this.createMessages();
+    this.messageTransportsComponent.createMessages($event);
   }
 
-  changeSendMessage(transport: GetTransport) {
-    if (!transport.isSent) {
-      transport.isSent = true;
-      this.postApiService.postTransport(transport).subscribe();
-    } else {
-      transport.isSent = false;
-      this.postApiService.postTransport(transport).subscribe();
-    }
+  refreshAllTransportsFromMainTransports() {
+    this.mainTransportsComponent.getAllTransports(this.actualEmporium.id);
   }
 }
 

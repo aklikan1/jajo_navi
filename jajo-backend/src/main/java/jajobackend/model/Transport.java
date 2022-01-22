@@ -23,14 +23,20 @@ public class Transport {
     @Column(length = 5, nullable = false)
     private Time time;
 
-    @Column (nullable = false)
+    @Column (nullable = false, columnDefinition="bool default false")
     private Boolean isSent;
+
+    @Column (nullable = false, columnDefinition="bool default false")
+    private Boolean isPaid;
 
     @Transient
     private List<Product> actualProducts;
 
     @Transient
     private List<Product> availableProducts;
+
+    @Transient
+    private Integer totalPayment;
 
     //One to Many
     @OneToMany (mappedBy = "transport")

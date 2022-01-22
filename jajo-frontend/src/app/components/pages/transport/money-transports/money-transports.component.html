@@ -1,0 +1,21 @@
+<div class="">
+  <mat-list role="list" *ngFor="let transport of allTransports">
+    <mat-list-item role="listitem" [id]="transport.id+'_sent'"
+                   [ngStyle]="{'background-color': transport.isPaid ? 'lightgrey' : 'transparent'}">
+      <div class="row col-12">
+        <div class="col col-2">
+          <p [ngStyle]="{'font-weight': transport.isPaid ? 'normal' : 'bold'}">{{transport.address.name}}</p>
+        </div>
+        <div class="col col-5">
+          {{"To Pay: "+transport.totalPayment+" zł"}}
+        </div>
+        <div class="col text-end">
+          <button class="button" [disabled]="transport.isPaid" (click)="changePaidOption(transport)"
+                  mat-icon-button>Paid </button>
+          <mat-checkbox [checked]="transport.isPaid" (change)="changePaidOption(transport)"></mat-checkbox>
+        </div>
+
+      </div>
+    </mat-list-item>
+  </mat-list>
+</div>

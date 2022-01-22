@@ -2,6 +2,7 @@ package jajobackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -15,10 +16,11 @@ public class Count {
     @Column(name = "count_id")
     private Long id;
 
-    private Long count;
+    private Integer count;
 
     //Many to One
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "transport_id")
     private Transport transport;
 

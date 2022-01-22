@@ -2,7 +2,9 @@ package jajobackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
+import org.springframework.data.relational.core.sql.In;
 
 import javax.persistence.*;
 import java.util.List;
@@ -21,10 +23,10 @@ public class Product {
     private String name;
 
     @Column (nullable = false)
-    private Long price;
+    private Integer price;
 
     @Column (nullable = false)
-    private Long cost;
+    private Integer cost;
 
     @Column (nullable = false)
     private Long hierarchy;
@@ -32,6 +34,7 @@ public class Product {
     //One to Many
     @OneToMany (mappedBy = "product")
     @JsonIgnore
+    @ToString.Exclude
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Count> counts;
 

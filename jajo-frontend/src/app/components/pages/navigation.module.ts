@@ -26,6 +26,8 @@ import { MainTransportsComponent } from './transport/mainTransports/mainTranspor
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {ClipboardModule} from "@angular/cdk/clipboard";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import { MessageTransportsComponent } from './transport/message-transports/message-transports.component';
+import { MoneyTransportsComponent } from './transport/money-transports/money-transports.component';
 
 
 @NgModule({
@@ -33,7 +35,9 @@ import {MatTooltipModule} from "@angular/material/tooltip";
     TransportComponent,
     AddressComponent,
     ProductsComponent,
-    MainTransportsComponent
+    MainTransportsComponent,
+    MessageTransportsComponent,
+    MoneyTransportsComponent
   ],
     imports: [
         CommonModule,

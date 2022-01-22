@@ -11,7 +11,9 @@ export interface GetTransport {
   addButton: boolean;
   actualProducts: GetProduct[];
   availableProducts: GetProduct[];
+  totalPayment: number;
   isSent: boolean;
+  isPaid: boolean;
 }
 
 export interface PostTransport {
@@ -20,4 +22,5 @@ export interface PostTransport {
   emporium: GetEmporium;
   time: string;
   isSent: boolean;
+  isPaid: boolean;
 }

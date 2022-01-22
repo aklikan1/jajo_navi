@@ -2,6 +2,7 @@ package jajobackend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -28,6 +29,7 @@ public class Address {
     //One to Many
     @OneToMany(mappedBy = "address")
     @JsonIgnore
+    @ToString.Exclude
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Transport> transports;
 

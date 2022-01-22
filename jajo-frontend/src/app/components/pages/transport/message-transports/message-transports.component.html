@@ -1,0 +1,26 @@
+<div class="modal-body">
+  <mat-slide-toggle [checked]="actualEmporium.isSunday" (change)="changeSundayOption()">Sunday message</mat-slide-toggle>
+</div>
+
+<div class="">
+  <mat-list role="list" *ngFor="let transport of allTransports">
+    <mat-list-item role="listitem" [id]="transport.id+'_sent'"
+                   [ngStyle]="{'background-color': transport.isSent? 'LightGreen' : 'transparent'}">
+      <div class="row col-12">
+        <div class="col col-2">
+          <p style="font-weight: bold">{{transport.address.name}}</p>
+        </div>
+        <div class="col col-5">
+          {{transport.message}}
+        </div>
+        <div class="col text-end">
+          <button class="button" mat-icon-button [cdkCopyToClipboard]="transport.message">
+            <mat-icon>file_copy</mat-icon>
+          </button>
+          <mat-checkbox [checked]="transport.isSent" (change)="changeSendMessage(transport)"></mat-checkbox>
+        </div>
+
+      </div>
+    </mat-list-item>
+  </mat-list>
+</div>

@@ -51,14 +51,20 @@ public class TransportController {
         List<Transport> transports = transportRepository.findAllByEmporiumIdOrderByAddressHierarchyAsc(id);
         transports.forEach(e -> {
             List<Product> tempActualProduct = new ArrayList<>();
+            var wrapper = new Object(){int tempPayment; };
+
             e.setAvailableProducts(productRepository.findAllByOrderByHierarchyAsc());
             List<Count> countsByEmporiumIdAndTransportId =
                     countRepository.findAllByTransportIdAndTransportEmporiumIdOrderByProductHierarchyAsc(e.getId(), id);
             countsByEmporiumIdAndTransportId.forEach( x -> {
                 tempActualProduct.add(x.getProduct());
                 e.getAvailableProducts().removeIf(obj -> obj.getId().equals(x.getProduct().getId()));
+
+                wrapper.tempPayment = wrapper.tempPayment+(x.getCount()*x.getProduct().getPrice());
             });
+
             e.setActualProducts(tempActualProduct);
+            e.setTotalPayment(wrapper.tempPayment);
         });
 
         return ResponseEntity.ok(transports);
@@ -81,6 +87,10 @@ public class TransportController {
         }
 
         if (transport.getIsSent() == null) {
+            transport.setIsSent(false);
+        }
+
+        if (transport.getIsPaid() == null) {
             transport.setIsSent(false);
         }
 
