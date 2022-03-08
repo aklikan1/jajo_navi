@@ -1,16 +1,14 @@
 package jajobackend.controller.database;
 
 import jajobackend.model.Count;
-import jajobackend.model.Message;
+import jajobackend.model.Payment;
 import jajobackend.model.Product;
 import jajobackend.model.Transport;
 import jajobackend.repository.CountRepository;
-import jajobackend.repository.MessageRepository;
+import jajobackend.repository.PaymentRepository;
 import jajobackend.repository.ProductRepository;
 import jajobackend.repository.TransportRepository;
-
-import java.sql.Time;
-import java.util.Date;
+import jajobackend.service.TakeProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +16,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,13 +30,19 @@ public class TransportController {
     private final TransportRepository transportRepository;
     private final CountRepository countRepository;
     private final ProductRepository productRepository;
+    private final PaymentRepository paymentRepository;
+
+    private final TakeProductService takeProductService;
 
     @Autowired
     public TransportController(TransportRepository transportRepository, CountRepository countRepository,
-                               ProductRepository productRepository) {
+                               ProductRepository productRepository, PaymentRepository paymentRepository,
+                               TakeProductService takeProductService) {
         this.transportRepository = transportRepository;
         this.countRepository = countRepository;
         this.productRepository = productRepository;
+        this.paymentRepository = paymentRepository;
+        this.takeProductService = takeProductService;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,7 +57,6 @@ public class TransportController {
         List<Transport> transports = transportRepository.findAllByEmporiumIdOrderByAddressHierarchyAsc(id);
         transports.forEach(e -> {
             List<Product> tempActualProduct = new ArrayList<>();
-            var wrapper = new Object(){int tempPayment; };
 
             e.setAvailableProducts(productRepository.findAllByOrderByHierarchyAsc());
             List<Count> countsByEmporiumIdAndTransportId =
@@ -59,12 +64,9 @@ public class TransportController {
             countsByEmporiumIdAndTransportId.forEach( x -> {
                 tempActualProduct.add(x.getProduct());
                 e.getAvailableProducts().removeIf(obj -> obj.getId().equals(x.getProduct().getId()));
-
-                wrapper.tempPayment = wrapper.tempPayment+(x.getCount()*x.getProduct().getPrice());
             });
 
             e.setActualProducts(tempActualProduct);
-            e.setTotalPayment(wrapper.tempPayment);
         });
 
         return ResponseEntity.ok(transports);
@@ -91,7 +93,18 @@ public class TransportController {
         }
 
         if (transport.getIsPaid() == null) {
-            transport.setIsSent(false);
+            transport.setIsPaid(false);
+        }
+
+        if (transport.getId() == null) {
+            Payment newPayment = new Payment();
+            newPayment.setPaymentEgg(0);
+            newPayment.setCostEgg(0);
+            newPayment.setPaymentHoney(0);
+            newPayment.setCostHoney(0);
+            newPayment.setTransport(transport);
+
+            paymentRepository.save(newPayment);
         }
 
         Transport save = transportRepository.save(transport);
@@ -106,7 +119,17 @@ public class TransportController {
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<?>deleteTransportById (@PathVariable Long id) {
+        Transport transport = transportRepository.getById(id);
+
+        List <Product> products = productRepository.findAllByCountsTransportId(id);
+        Long emporiumId = transport.getEmporium().getId();
+
         transportRepository.deleteById(id);
+
+        products.forEach(value -> {
+            takeProductService.addTakeProducts(value, emporiumId);
+        });
+
         return ResponseEntity.noContent().build();
     }
 }

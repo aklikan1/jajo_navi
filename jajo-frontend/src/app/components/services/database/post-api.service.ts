@@ -7,6 +7,7 @@ import {PostProduct} from "../../model/product";
 import {PostEmporium} from "../../model/emporium";
 import {PostCount} from "../../model/count";
 import {PostTransport} from "../../model/transport";
+import {PostPayment} from "../../model/payment";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class PostApiService {
   private POST_EMPORIUM = `${this.baseUrl.baseUrl}\\emporium`;
   private POST_COUNT = `${this.baseUrl.baseUrl}\\count`
   private POST_TRANSPORT = `${this.baseUrl.baseUrl}\\transport`
+  private POST_PAYMENT = `${this.baseUrl.baseUrl}\\payment`
 
   constructor(private http: HttpClient, private baseUrl: BaseUrlService) {}
 
@@ -41,5 +43,9 @@ export class PostApiService {
 
   postTransport(transport: PostTransport): Observable<any> {
     return this.http.post(this.POST_TRANSPORT, transport);
+  }
+
+  postPayment (payment: PostPayment): Observable<any> {
+    return this.http.post(this.POST_PAYMENT, payment);
   }
 }

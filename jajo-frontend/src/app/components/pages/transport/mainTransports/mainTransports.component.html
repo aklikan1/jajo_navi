@@ -17,7 +17,7 @@
 
           <!-- Przycisk do dodania towaru dla transportu -->
           <button (click)="disableShowProductList(transport)" mat-icon-button [matMenuTriggerFor]="addProductToList"
-                  [disabled]="transport.availableProducts.length === 0">
+                  [disabled]="transport.availableProducts.length === 0 || transport.isPaid == true">
             <mat-menu #addProductToList="matMenu">
               <ng-container *ngFor="let product of transport.availableProducts">
                 <button mat-menu-item (click)="addTransportCount(quantityProduct, product, transport)"
@@ -43,7 +43,7 @@
 
         <mat-panel-description class="col-5"></mat-panel-description>
         <mat-panel-description class="" style="align-items: center">
-          <button mat-icon-button class="deleteTransportButton" type="button"
+          <button mat-icon-button class="deleteTransportButton" type="button" [disabled]="transport.isPaid==true"
                   (click)="deleteTransportById(confirmDeleteModal, transport); disableShowProductList(transport)" >
             <mat-icon>delete</mat-icon>
           </button>
@@ -51,21 +51,31 @@
       </mat-expansion-panel-header>
 
       <ng-container *ngFor="let count of countsByEmporiumId" class="container">
-        <table class="col-5">
+        <table class="col col-6">
           <tr *ngIf="count.transport.id === transport.id">
-            <th class="col-1">
+            <th class="col col-1">
               <button mat-icon-button class="deleteCountButton" type="button"
+                      [disabled]="transport.isPaid==true"
                       (click)="deleteCountById(count, transport)" >
                 <mat-icon>delete</mat-icon>
               </button>
             </th>
-            <th class="col-4">
+            <th class="col col-4">
               {{count.product.name}}
             </th>
-            <th class="col-1">
-              <input class="input-label drag-box" (dblclick)="changeReadOnly(count)" (blur)="lostFocus(count)"
+            <th class="col col-1">
+              <input class="input-label drag-box" (dblclick)="changeReadOnly(count, transport)" (blur)="lostFocus(count)"
                      [(ngModel)]="count.count" [readOnly]="count.readonly" id="{{count.id}}-count"
                      (change)="updateCountById(count)" style="text-align: center;" type="number">
+            </th>
+            <th class="col col-1">
+              <span [ngStyle]="{'color': count.product.id != 1 ? 'black' : 'transparent'}">Liquid</span>
+            </th>
+            <th class="col col-1">
+              <input [ngStyle]="{'color': count.product.id != 1 ? 'black' : 'transparent'}"
+                     (dblclick)="changeReadOnly(count, transport)" (blur)="lostFocus(count)" [readOnly]="count.readonly"
+                     (change)="updateCountById(count)" [(ngModel)]="count.liquid"
+                     class="input-label drag-box" style="text-align: center;" type="number">
             </th>
           </tr>
         </table>
@@ -106,7 +116,7 @@
     <div class="modal-footer">
       <div>
         <label for="quantity">Quantity: </label>
-        <input class="form-control" id="quantity" type="number"
+        <input class="form-control" id="quantity" type="number" autofocus
                [(ngModel)]="quantity" name="budgetName" (keyup.enter)="modal.close()" autocomplete="off">
       </div>
       <div class="modal-footer">

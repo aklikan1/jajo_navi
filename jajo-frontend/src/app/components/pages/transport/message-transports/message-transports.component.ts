@@ -19,6 +19,7 @@ export class MessageTransportsComponent implements OnInit {
   @Output() public sundayOptionEmitter = new EventEmitter <void>();
 
   public allMessages: GetMessage[] = [];
+  public transportAndTimeMessage: string = "";
 
   constructor(private getApiService: GetApiService,
               private postApiService: PostApiService) { }
@@ -89,4 +90,20 @@ export class MessageTransportsComponent implements OnInit {
     }
   }
 
+  copyAllTransportTime() {
+    this.transportAndTimeMessage = "";
+    this.allTransports.forEach(
+      (value, index) => {
+        let address = value.address.name;
+        let time = value.message.substring(value.message.length - 5);
+        if (!(index+1 == this.allTransports.length)) {
+          this.transportAndTimeMessage = this.transportAndTimeMessage + address+" - "+time+"\n";
+        } else {
+          this.transportAndTimeMessage = this.transportAndTimeMessage + address+" - "+time;
+        }
+      }
+    );
+
+    //console.log(this.transportAndTimeMessage);
+  }
 }

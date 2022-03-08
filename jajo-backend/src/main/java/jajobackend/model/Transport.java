@@ -35,11 +35,12 @@ public class Transport {
     @Transient
     private List<Product> availableProducts;
 
-    @Transient
-    private Integer totalPayment;
+    //One to One
+    @OneToOne(mappedBy = "transport", cascade = CascadeType.ALL)
+    private Payment payment;
 
     //One to Many
-    @OneToMany (mappedBy = "transport")
+    @OneToMany (mappedBy = "transport", cascade = CascadeType.ALL)
     @JsonIgnore
     @Cascade(org.hibernate.annotations.CascadeType.ALL)
     private List<Count> counts;

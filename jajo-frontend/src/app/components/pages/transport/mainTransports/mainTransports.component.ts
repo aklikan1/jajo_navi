@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, TemplateRef} from '@angular/core';
+import {Component, EventEmitter, Input, NgZone, OnInit, Output, TemplateRef} from '@angular/core';
 import {GetTransport, PostTransport} from "../../../model/transport";
 import {NgbModal} from "@ng-bootstrap/ng-bootstrap";
 import {GetApiService} from "../../../services/database/get-api.service";
@@ -9,6 +9,7 @@ import {GetEmporium} from "../../../model/emporium";
 import {GetProduct} from "../../../model/product";
 import {GetCount, PostCount} from "../../../model/count";
 import {DateTime} from "luxon";
+import {tap} from "rxjs/operators";
 
 @Component({
   selector: 'app-mainTransports',
@@ -26,6 +27,7 @@ export class MainTransportsComponent implements OnInit {
 
   @Input() public actualEmporium: GetEmporium = <GetEmporium>{};
   @Output() public refreshAllTransports = new EventEmitter <GetTransport[]>();
+  @Output() public refreshCount = new EventEmitter<void>();
 
   public transports: GetTransport[] = [];
   public allProducts: GetProduct[] = [];
@@ -34,7 +36,8 @@ export class MainTransportsComponent implements OnInit {
   public countsByEmporiumId: GetCount[] = [];
 
   constructor(private modalService: NgbModal, private getApiService: GetApiService,
-              private postApiService: PostApiService, private deleteApiService: DeleteApiService) { }
+              private postApiService: PostApiService, private deleteApiService: DeleteApiService,
+              private ngZone: NgZone) { }
 
   ngOnInit(): void {}
 
@@ -107,6 +110,7 @@ export class MainTransportsComponent implements OnInit {
                 this.sortTransportsByAddressHierarchy();
 
                 this.refreshAllTransports.emit(this.transports);
+                this.refreshCount.emit();
               }
             );
           }
@@ -146,25 +150,27 @@ export class MainTransportsComponent implements OnInit {
   }
 
   addTransportCount(quantityProduct: TemplateRef<any>, product: GetProduct, transport: GetTransport) {
+    this.quantity = 0;
 
     this.modalService.open(quantityProduct, {backdrop: false}).result.then(
       () => {
-        if (this.quantity === undefined || this.quantity === null) {
-          this.quantity = 0;
-        }
+
         let tempQuantity: PostCount = <PostCount>{};
         tempQuantity.count = this.quantity;
+        tempQuantity.liquid = 0;
         tempQuantity.product = product;
         tempQuantity.transport = transport;
 
         this.postApiService.postCount(tempQuantity).subscribe(
           value => {
+            value.readonly = true;
             this.countsByEmporiumId.push(value);
             this.countsByEmporiumId.sort((n1, n2) => n1.product.hierarchy - n2.product.hierarchy);
 
             transport.availableProducts = transport.availableProducts.filter( obj => obj !== product);
 
             this.getAllTransports(this.actualEmporium.id);
+            this.refreshCount.emit();
           }
         );
       }
@@ -175,6 +181,7 @@ export class MainTransportsComponent implements OnInit {
     this.postApiService.postCount(count).subscribe(
       () => {
         this.getAllTransports(this.actualEmporium.id);
+        this.refreshCount.emit();
       }
     );
 
@@ -190,6 +197,7 @@ export class MainTransportsComponent implements OnInit {
         transport.availableProducts.sort((n1, n2) => n1.hierarchy - n2.hierarchy);
 
         this.getAllTransports(this.actualEmporium.id);
+        this.refreshCount.emit();
       }
     );
   }
@@ -261,8 +269,10 @@ export class MainTransportsComponent implements OnInit {
     });
   }
 
-  changeReadOnly(count: GetCount) {
-    count.readonly = false;
+  changeReadOnly(count: GetCount, transport: GetTransport) {
+    if (!transport.isPaid) {
+      count.readonly = false;
+    }
   }
 
   lostFocus(count: GetCount) {

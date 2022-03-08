@@ -21,6 +21,12 @@ public class Emporium {
 
     private Boolean isSunday;
 
+    //One to One
+    @OneToOne(mappedBy = "emporium")
+    @JsonIgnore
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private ProductsIncome productsIncome;
+
     //One to Many
     @OneToMany (mappedBy = "emporium")
     @JsonIgnore

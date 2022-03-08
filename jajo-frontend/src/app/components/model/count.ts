@@ -7,10 +7,12 @@ export interface GetCount {
   transport: GetTransport;
   product: GetProduct;
   readonly: boolean;
+  liquid: number;
 }
 
 export interface PostCount {
   count: number;
+  liquid: number;
   transport: GetTransport;
   product: GetProduct;
 }

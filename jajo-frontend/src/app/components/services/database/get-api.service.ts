@@ -7,8 +7,8 @@ import {GetProduct} from "../../model/product";
 import {GetTransport} from "../../model/transport";
 import {GetEmporium} from "../../model/emporium";
 import {GetCount} from "../../model/count";
-import {Message} from "@angular/compiler/src/i18n/i18n_ast";
 import {GetMessage} from "../../model/message";
+import {GetPayment} from "../../model/payment";
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +22,9 @@ export class GetApiService {
   private GET_ALL_TRANSPORTS_BY_EMPORIUM_ID = `${this.baseUrl.baseUrl}\\transport\\emporium\\`;
   private GET_ALL_EMPORIUMS = `${this.baseUrl.baseUrl}\\emporium`;
   private GET_ALL_COUNTS_BY_EMPORIUM_ID = `${this.baseUrl.baseUrl}\\count\\emporium\\`;
-  private GET_ALL_MESSAGES = `${this.baseUrl.baseUrl}\\message` ;
+  private GET_ALL_MESSAGES = `${this.baseUrl.baseUrl}\\message`;
+  private GET_ALL_PAYMENTS_BY_EMPORIUM_ID = `${this.baseUrl.baseUrl}\\payment\\emporium\\`;
+  private GET_PRODUCTS_INCOME_BY_EMPORIUM_ID = `${this.baseUrl.baseUrl}\\productsIncome\\emporium\\`;
 
   constructor(private http: HttpClient, private baseUrl: BaseUrlService) { }
 
@@ -58,5 +60,13 @@ export class GetApiService {
 
   getAllMessages() : Observable<GetMessage[]> {
     return this.http.get<GetMessage[]>(this.GET_ALL_MESSAGES);
+  }
+
+  getAllPaymentsByEmporiumId(id: number): Observable<GetPayment[]> {
+    return this.http.get<GetPayment[]>(this.GET_ALL_PAYMENTS_BY_EMPORIUM_ID+id);
+  }
+
+  getProductsIncomeByEmporiumId (id: number): Observable<any> {
+    return this.http.get<any>(this.GET_PRODUCTS_INCOME_BY_EMPORIUM_ID+id);
   }
 }

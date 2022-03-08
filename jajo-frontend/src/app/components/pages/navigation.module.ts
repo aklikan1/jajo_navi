@@ -28,6 +28,7 @@ import {ClipboardModule} from "@angular/cdk/clipboard";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import { MessageTransportsComponent } from './transport/message-transports/message-transports.component';
 import { MoneyTransportsComponent } from './transport/money-transports/money-transports.component';
+import { ProductsTransportComponent } from './transport/products-transport/products-transport.component';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { MoneyTransportsComponent } from './transport/money-transports/money-tra
     ProductsComponent,
     MainTransportsComponent,
     MessageTransportsComponent,
-    MoneyTransportsComponent
+    MoneyTransportsComponent,
+    ProductsTransportComponent
   ],
     imports: [
         CommonModule,

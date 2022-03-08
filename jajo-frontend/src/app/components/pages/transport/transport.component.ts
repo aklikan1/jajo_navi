@@ -7,6 +7,10 @@ import {GetEmporium, PostEmporium} from "../../model/emporium";
 import {MainTransportsComponent} from "./mainTransports/mainTransports.component";
 import {GetTransport} from "../../model/transport";
 import {MessageTransportsComponent} from "./message-transports/message-transports.component";
+import {MoneyTransportsComponent} from "./money-transports/money-transports.component";
+import {GetCount} from "../../model/count";
+import {ProductsTransportComponent} from "./products-transport/products-transport.component";
+import {GetProduct} from "../../model/product";
 
 @Component({
   selector: 'app-transport',
@@ -17,6 +21,7 @@ export class TransportComponent implements OnInit {
 
   public emporiums: GetEmporium[] = [];
   public allTransports: GetTransport[] = [];
+  public countsByEmporiumId: GetCount[] = [];
 
   public actualEmporium: GetEmporium = <GetEmporium>{};
 
@@ -25,6 +30,8 @@ export class TransportComponent implements OnInit {
 
   @ViewChild(MainTransportsComponent) private mainTransportsComponent!: MainTransportsComponent;
   @ViewChild(MessageTransportsComponent) private messageTransportsComponent!: MessageTransportsComponent;
+  @ViewChild(MoneyTransportsComponent) private moneyTransportComponent!: MoneyTransportsComponent;
+  @ViewChild(ProductsTransportComponent) private productsTransportComponent!: ProductsTransportComponent;
 
   constructor(private modalService: NgbModal, private getApiService: GetApiService,
               private postApiService: PostApiService, private deleteApiService: DeleteApiService,
@@ -44,6 +51,10 @@ export class TransportComponent implements OnInit {
         this.mainTransportsComponent.getAllTransports(actualEmporiumId);
         this.mainTransportsComponent.getAllCountsByEmporiumId(actualEmporiumId);
         this.mainTransportsComponent.getAllProducts();
+
+        this.moneyTransportComponent.getAllPaymentsByEmporiumId(actualEmporiumId);
+
+        this.productsTransportComponent.getCountProductsByEmporiumId(this.actualEmporium.id);
       }
     );
   }
@@ -53,6 +64,7 @@ export class TransportComponent implements OnInit {
 
     this.mainTransportsComponent.getAllTransports(emporium.id);
     this.mainTransportsComponent.getAllCountsByEmporiumId(emporium.id);
+    this.productsTransportComponent.getCountProductsByEmporiumId(this.actualEmporium.id);
   }
 
   addNewEmporium(content: TemplateRef<any>) {
@@ -116,6 +128,12 @@ export class TransportComponent implements OnInit {
   refreshAllTransportsFromMainTransports() {
     this.mainTransportsComponent.getAllTransports(this.actualEmporium.id);
   }
+
+  refreshMoney() {
+    this.moneyTransportComponent.getAllPaymentsByEmporiumId(this.actualEmporium.id);
+    this.productsTransportComponent.getCountProductsByEmporiumId(this.actualEmporium.id);
+  }
+
 }
 
 

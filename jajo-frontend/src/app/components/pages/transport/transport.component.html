@@ -8,26 +8,29 @@
       <mat-card-content class="m-b-0">
         <mat-card-title>Transport</mat-card-title>
         <mat-card-subtitle>All information about transport and other bullshit</mat-card-subtitle>
+
+        <div class="">
+          <button mat-stroked-button [matMenuTriggerFor]="actEmporium" color="primary">{{actualEmporium.name}}</button>
+          <mat-menu #actEmporium="matMenu">
+            <ng-container *ngFor="let emporium of emporiums">
+              <button mat-menu-item (click)="changeActualEmporium(emporium)">{{emporium.name}}</button>
+            </ng-container>
+          </mat-menu>
+          <button mat-icon-button color="primary" (click)="addNewEmporium(newEmporiumTemplate)">
+            <mat-icon>add_circle_outline</mat-icon></button>
+          <button mat-icon-button color="primary" (click)="deleteEmporiumById(confirmDeleteModal, actualEmporium)"
+                  [disabled]="emporiums.length === 1">
+            <mat-icon>clear</mat-icon></button>
+        </div>
       </mat-card-content>
-      <div class="container" style="margin-bottom: 5px">
-        <button mat-stroked-button [matMenuTriggerFor]="actEmporium" color="primary">{{actualEmporium.name}}</button>
-        <mat-menu #actEmporium="matMenu">
-          <ng-container *ngFor="let emporium of emporiums">
-            <button mat-menu-item (click)="changeActualEmporium(emporium)">{{emporium.name}}</button>
-          </ng-container>
-        </mat-menu>
-        <button mat-icon-button color="primary" (click)="addNewEmporium(newEmporiumTemplate)">
-          <mat-icon>add_circle_outline</mat-icon></button>
-        <button mat-icon-button color="primary" (click)="deleteEmporiumById(confirmDeleteModal, actualEmporium)"
-                [disabled]="emporiums.length === 1">
-          <mat-icon>clear</mat-icon></button>
-      </div>
+
       <div class="p-l-20 p-r-20 p-b-20">
         <mat-tab-group animationDuration="0ms">
           <!-- Zakładka: Transport -->
           <mat-tab label="Transport">
             <app-mainTransports [actualEmporium]="actualEmporium"
-                                (refreshAllTransports)="changeSundayOption($event)">
+                                (refreshAllTransports)="changeSundayOption($event)"
+                                (refreshCount)="refreshMoney()">
             </app-mainTransports>
           </mat-tab>
 
@@ -46,7 +49,10 @@
           </mat-tab>
 
           <!-- Zakładka: Count products -->
-          <mat-tab label="Count products">Content 4</mat-tab>
+          <mat-tab label="Count products">
+            <app-products-transport [actualEmporium]="actualEmporium">
+            </app-products-transport>
+          </mat-tab>
         </mat-tab-group>
       </div>
     </mat-card>

@@ -11,7 +11,6 @@ export interface GetTransport {
   addButton: boolean;
   actualProducts: GetProduct[];
   availableProducts: GetProduct[];
-  totalPayment: number;
   isSent: boolean;
   isPaid: boolean;
 }

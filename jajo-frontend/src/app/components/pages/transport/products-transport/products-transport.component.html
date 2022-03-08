@@ -1,0 +1,44 @@
+<div class="">
+  <mat-list role="list" >
+
+    <mat-list-item role="listitem" *ngFor="let takeProduct of takeProducts">
+      <div class="row col-12">
+        <div class="col col-2">
+          <p style="font-weight: bold">{{takeProduct.productName}}</p>
+        </div>
+        <div class="col col-1">
+          <span>{{takeProduct.productCount}}</span>
+        </div>
+        <div class="col col-1" [ngStyle]="{'color': takeProduct.productId != 1 ? 'black' : 'transparent',
+        'color': takeProduct.liquid != 0 ? 'black' : 'transparent'}">
+          <span>Liquid:</span>
+        </div>
+        <div class="col col-1" [ngStyle]="{'color': takeProduct.productId != 1 ? 'black' : 'transparent',
+        'color': takeProduct.liquid != 0 ? 'black' : 'transparent'}">
+          <span>{{takeProduct.liquid}}</span>
+        </div>
+      </div>
+    </mat-list-item>
+    <mat-list-item>
+      <div class="col col-1">
+        <span style="font-weight: bold">Zarobek:</span>
+      </div>
+      <div class="col col-1">
+        <span>{{incomeMoney}}</span>
+      </div>
+    </mat-list-item>
+    <mat-list-item>
+      <div class="col col-1">
+        <span style="font-weight: bold">Dla izy:</span>
+      </div>
+      <div class="col col-1">
+        <span>{{izaMoney}}</span>
+      </div>
+      <div class="col col-1">
+        <button mat-icon-button [cdkCopyToClipboard]="messageToIza">Copy
+          <mat-icon>file_copy</mat-icon>
+        </button>
+      </div>
+    </mat-list-item>
+  </mat-list>
+</div>

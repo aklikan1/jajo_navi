@@ -1,0 +1,16 @@
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Dom', 1);
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Sebastian', 2);
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Niepołomicka 10/3213', 3);
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Nie wiem jeszcze co', 4);
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Gabi', 5);
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Whisky', 6);
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Burbon', 7);
+INSERT INTO `jajo-navi`.`address` (`name`, `hierarchy`) VALUES ('Ehhhhh', 8);
+INSERT INTO `jajo-navi`.`product` (`name`, `price`, `cost`, `hierarchy`) VALUES ('Jajka', 25, 18, 1);
+INSERT INTO `jajo-navi`.`product` (`name`, `price`, `cost`, `hierarchy`) VALUES ('Miód rzepakowy duży', 38, 31, 2);
+INSERT INTO `jajo-navi`.`product` (`name`, `price`, `cost`, `hierarchy`) VALUES ('Miód rzepakowy średni', 25, 20, 3);
+INSERT INTO `jajo-navi`.`product` (`name`, `price`, `cost`, `hierarchy`) VALUES ('Miód rzepakowy mały', 15, 10, 4);
+INSERT INTO `jajo-navi`.`message` (`message`, `is_Mr_Mrs`, `is_Sunday`) VALUES ('Hej. Będę w niedzielę ok ', false, true);
+INSERT INTO `jajo-navi`.`message` (`message`, `is_Mr_Mrs`, `is_Sunday`) VALUES ('Dzień dobry. Będę w niedzielę ok ', true, true);
+INSERT INTO `jajo-navi`.`message` (`message`, `is_Mr_Mrs`, `is_Sunday`) VALUES ('Hej. Będę jutro ok ', false, false);
+INSERT INTO `jajo-navi`.`message` (`message`, `is_Mr_Mrs`, `is_Sunday`) VALUES ('Dzień dobry. Będę jutro ok ', true, false);

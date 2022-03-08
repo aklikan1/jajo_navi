@@ -26,6 +26,10 @@ public class Address {
     @Column(nullable = false, columnDefinition = "boolean default false")
     private Boolean isMrMrs;
 
+    //One to One
+    @OneToOne(mappedBy = "address", cascade = CascadeType.ALL)
+    private Bank bank;
+
     //One to Many
     @OneToMany(mappedBy = "address")
     @JsonIgnore
