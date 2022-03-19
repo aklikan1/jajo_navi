@@ -64,7 +64,12 @@ export class ProductsComponent implements OnInit {
         newProduct.name = this.newProductName;
         newProduct.price = this.newProductPrice;
         newProduct.cost = this.newProductCost;
-        newProduct.hierarchy = this.products[this.products.length - 1].hierarchy + 1;
+
+        if (this.products.length != 0){
+          newProduct.hierarchy = this.products[this.products.length - 1].hierarchy + 1;
+        } else {
+          newProduct.hierarchy = 1;
+        }
 
         newProduct.name_readonly = true;
         newProduct.price_readonly = true;
@@ -73,6 +78,7 @@ export class ProductsComponent implements OnInit {
         this.postApiService.postProduct(newProduct).subscribe(
           value => {
             this.products.push(value);
+            //this.getAllProducts();
           }
         );
 

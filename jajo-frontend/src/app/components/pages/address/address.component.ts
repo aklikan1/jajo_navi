@@ -65,8 +65,14 @@ export class AddressComponent implements OnInit {
         if (this.newAddressName === "") {
           this.newAddressName = "Nowy Adres";
         }
+
         newAddress.name = this.newAddressName;
-        newAddress.hierarchy = this.addresses[this.addresses.length - 1].hierarchy + 1;
+
+        if (this.addresses.length == 0) {
+          newAddress.hierarchy = 1;
+        } else {
+          newAddress.hierarchy = this.addresses[this.addresses.length - 1].hierarchy + 1;
+        }
 
         newAddress.read_only = true;
         newAddress.isMrMrs = false;
